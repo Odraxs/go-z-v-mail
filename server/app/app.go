@@ -10,13 +10,10 @@ import (
 
 type App struct {
 	router      http.Handler
-	credentials ZincsearchCredentials
 }
 
-func New(credentials ZincsearchCredentials) *App {
-	app := &App{
-		credentials: credentials,
-	}
+func New() *App {
+	app := &App{}
 
 	app.loadRoutes()
 	return app

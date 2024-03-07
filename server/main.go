@@ -7,11 +7,12 @@ import (
 	"os/signal"
 
 	"github.com/Odraxs/go-z-v-mail/server/app"
+	"github.com/Odraxs/go-z-v-mail/server/config"
 )
 
 func main() {
-	config := app.LoadZincsearchCredentials()
-	app := app.New(config)
+	config.LoadZincsearchCredentials()
+	app := app.New()
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()

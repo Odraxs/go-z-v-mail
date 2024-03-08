@@ -2,6 +2,7 @@
 import globalState from '@/helpers/globalState'
 import type { Email } from '@/types'
 import { computed } from 'vue'
+import { InboxArrowDown, InboxStack } from '@/components/ui/icons'
 
 const email = computed<Email | null>(() => globalState.getEmailInfo())
 </script>
@@ -27,18 +28,22 @@ const email = computed<Email | null>(() => globalState.getEmailInfo())
         {{ email.subject }}
       </h1>
       <figcaption class="flex items-start mt-6 space-x-3 rtl:space-x-reverse">
-        <!--Icon -->
         <div
           class="flex items-center divide-x-2 rtl:divide-x-reverse divide-gray-300 dark:divide-gray-700"
         >
-          <cite class="pe-3 font-medium text-gray-900 dark:text-white">From</cite>
+          <cite
+            class="flex gap-3 justify-center items-center pe-3 font-medium text-gray-900 dark:text-white"
+            >From <InboxArrowDown class="w-5 h-5"
+          /></cite>
           <cite class="ps-3 text-md text-gray-700 dark:text-gray-400">{{ email.from }}</cite>
         </div>
       </figcaption>
       <figcaption class="flex items-center mt-6 space-x-3 rtl:space-x-reverse">
-        <!--Icon -->
         <div class="flex items-start">
-          <cite class="pe-3 font-medium text-gray-900 dark:text-white mr-[1.35rem]">To</cite>
+          <cite
+            class="flex gap-3 justify-center items-center pe-3 font-medium text-gray-900 dark:text-white mr-[0.06rem]"
+            >To <InboxStack class="ml-5 w-5 h-5"
+          /></cite>
           <cite
             class="ps-3 text-md text-gray-700 dark:text-gray-400 border-l-2 border-gray-300 dark:border-gray-700"
             >{{ email.to }}</cite

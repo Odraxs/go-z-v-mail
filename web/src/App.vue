@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import EmailsVisualizer from './components/EmailsVisualizer.vue'
 </script>
 
 <template>
   <header>
     <div>
-      <HelloWorld msg="Hello world" />
+      <EmailsVisualizer msg="GO-Z-V-MAIL" />
     </div>
   </header>
 </template>

@@ -23,28 +23,17 @@ func NewZincsearchRepository() Repo {
 
 // GetEmails implements Repo.
 func (z *ZincsearchRepo) GetEmails(ctx context.Context, filter string) (EmailSearchResponse, error) {
-	requestBody := map[string]interface{}{
-		"search_type": "matchphrase",
-		"query": map[string]interface{}{
-			"term":  filter,
-			"field": "content",
+	requestBody := SearchDocumentsBody{
+		SearchType: "matchphrase",
+		Query: SearchDocumentsQuery{
+			Term:  filter,
+			Field: "content",
 		},
-		"from":        0,
-		"max_results": 200,
-		"_source":     []string{},
-		"highlight": map[string]interface{}{
-			"pre_tags":  []string{"<strong>"},
-			"post_tags": []string{"</strong>"},
-			"fields": map[string]interface{}{
-				"title": map[string]interface{}{
-					"pre_tags":  []string{},
-					"post_tags": []string{},
-				},
-				"content": map[string]interface{}{
-					"pre_tags":  []string{},
-					"post_tags": []string{},
-				},
-			},
+		From:       0,
+		MaxResults: 200,
+		Highlight: Highlight{
+			PreTags:  []string{"<strong>"},
+			PostTags: []string{"<strong>"},
 		},
 	}
 

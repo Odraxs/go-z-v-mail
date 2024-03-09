@@ -35,3 +35,26 @@ type EmailSearchResult struct {
 		} `json:"hits"`
 	} `json:"hits"`
 }
+
+type SearchDocumentsBody struct {
+	SearchType string                   `json:"search_type"`
+	SortFields []string                 `json:"sort_fields"`
+	From       int                      `json:"from"`
+	MaxResults int                      `json:"max_results"`
+	Query      SearchDocumentsQuery `json:"query"`
+	Source     []string                 `json:"_source"`
+	Highlight  Highlight                `json:"highlight"`
+}
+
+type SearchDocumentsQuery struct {
+	Term      string  `json:"term"`
+	Field     string  `json:"field"`
+	StartTime *string `json:"start_time,omitempty"`
+	EndTime   *string `json:"end_time,omitempty"`
+}
+
+type Highlight struct {
+	PreTags  []string                  `json:"pre_tags"`
+	PostTags []string                  `json:"post_tags"`
+	Fields   *map[string]interface{} `json:"fields,omitempty"`
+}

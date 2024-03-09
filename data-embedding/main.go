@@ -12,62 +12,27 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Odraxs/go-z-v-mail/data-embedding/utils"
 	"github.com/jhillyerd/enmime"
 )
 
-type EmailData struct {
-	From            string `json:"from"`
-	To              string `json:"to"`
-	Subject         string `json:"subject"`
-	Content         string `json:"content"`
-	MessageID       string `json:"message_id"`
-	Date            string `json:"date"`
-	ContentType     string `json:"content_type"`
-	MimeVersion     string `json:"mime_version"`
-	ContentEncoding string `json:"content_transfer_encoding"`
-	XFrom           string `json:"x_from"`
-	XTo             string `json:"x_to"`
-	Xcc             string `json:"x_cc"`
-	Xbcc            string `json:"x_bcc"`
-	XFolder         string `json:"x_folder"`
-	XOrigin         string `json:"x_origin"`
-	XFilename       string `json:"x_filename"`
-}
-
-type BulkData struct {
-	Index   string      `json:"index"`
-	Records []EmailData `json:"records"`
-}
-
-type PropertyDetail struct {
-	Type          string `json:"type"`
-	Index         bool   `json:"index"`
-	Store         bool   `json:"store"`
-	Sortable      bool   `json:"sortable"`
-	Aggregatable  bool   `json:"aggregatable"`
-	Highlightable bool   `json:"highlightable"`
-}
-
-type Mapping struct {
-	Properties map[string]PropertyDetail `json:"properties"`
-}
-
-type IndexerData struct {
-	Name         string  `json:"name"`
-	StorageType  string  `json:"storage_type"`
-	ShardNum     int     `json:"shard_num"`
-	MappingField Mapping `json:"mappings"`
-}
+const (
+	jsonIndexerPath     = "./index.json"
+	indexName           = "emails"
+	dataToIndexRootPath = "./maildir/"
+	zincsearchBaseUrl   = "http://localhost:4080/api"
+)
 
 func main() {
 	log.Println("Starting indexer!")
-	indexerData, err := createIndexerFromJsonFile("./index.json")
+	utils.CpuProfiling()
+	indexerData, err := createIndexerFromJsonFile(jsonIndexerPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("Deleting index if exists...")
-	deleted := deleteIndexOnZincSearch("emails")
+	deleted := deleteIndexOnZincSearch(indexName)
 	if deleted != nil {
 		log.Println("Index doesn't exist. Creating...")
 	}
@@ -81,12 +46,12 @@ func main() {
 	log.Println("Start indexing, this might take a few minutes...")
 	startTime := time.Now()
 
-	var records []EmailData
+	var records []utils.EmailData
 	var locker sync.Mutex
 	var wg sync.WaitGroup
 
-	// Process all the folders contained in the path ./maildir/ to obtain all the needer records
-	err = filepath.Walk("./maildir/", func(path string, info os.FileInfo, err error) error {
+	// Process all the folders contained in the path `dataToIndexRootPath` to obtain all the emails records
+	err = filepath.Walk(dataToIndexRootPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -113,21 +78,21 @@ func main() {
 	wg.Wait()
 
 	sendBulkToZincSearch(records)
-
+	utils.MemoryProfiling()
 	duration := time.Since(startTime)
 	log.Printf("Finished indexing. Time taken: %.2f seconds", duration.Seconds())
 }
 
-func processFile(path string) (EmailData, error) {
+func processFile(path string) (utils.EmailData, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
-		return EmailData{}, err
+		return utils.EmailData{}, err
 	}
 	mime, err := enmime.ReadEnvelope(bytes.NewReader(content))
 	if err != nil {
-		return EmailData{}, err
+		return utils.EmailData{}, err
 	}
-	return EmailData{
+	return utils.EmailData{
 		From:            mime.GetHeader("From"),
 		To:              mime.GetHeader("To"),
 		Subject:         mime.GetHeader("Subject"),
@@ -147,8 +112,8 @@ func processFile(path string) (EmailData, error) {
 	}, nil
 }
 
-func sendBulkToZincSearch(records []EmailData) {
-	bulkData := BulkData{
+func sendBulkToZincSearch(records []utils.EmailData) {
+	bulkData := utils.BulkData{
 		Index:   "emails",
 		Records: records,
 	}
@@ -159,12 +124,12 @@ func sendBulkToZincSearch(records []EmailData) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:4080/api/_bulkv2", bytes.NewReader(jsonData))
+	req, err := http.NewRequest("POST", zincsearchBaseUrl+"/_bulkv2", bytes.NewReader(jsonData))
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	//change to evn later
+	//TODO: change to .evn latter
 	req.SetBasicAuth("admin", "password")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36")
@@ -183,8 +148,8 @@ func sendBulkToZincSearch(records []EmailData) {
 	}
 }
 
-func createIndexerFromJsonFile(filepath string) (IndexerData, error) {
-	var indexerData IndexerData
+func createIndexerFromJsonFile(filepath string) (utils.IndexerData, error) {
+	var indexerData utils.IndexerData
 
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -201,13 +166,13 @@ func createIndexerFromJsonFile(filepath string) (IndexerData, error) {
 	return indexerData, nil
 }
 
-func createIndexOnZincSearch(indexerData IndexerData) error {
+func createIndexOnZincSearch(indexerData utils.IndexerData) error {
 	jsonData, err := json.Marshal(indexerData)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:4080/api/index", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", zincsearchBaseUrl+"/index", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -230,12 +195,12 @@ func createIndexOnZincSearch(indexerData IndexerData) error {
 }
 
 func deleteIndexOnZincSearch(indexName string) error {
-	req, err := http.NewRequest("DELETE", "http://localhost:4080/api/index/"+indexName, nil)
+	req, err := http.NewRequest("DELETE", zincsearchBaseUrl+"/index/"+indexName, nil)
 	if err != nil {
 		return err
 	}
 
-	// Change to env file latter
+	//TODO: Change to .env file latter
 	req.SetBasicAuth("admin", "password")
 
 	client := &http.Client{}

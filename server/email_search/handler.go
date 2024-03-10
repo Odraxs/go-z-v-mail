@@ -8,7 +8,7 @@ import (
 )
 
 type Repo interface {
-	GetEmails(ctx context.Context, filter string) (EmailSearchResponse, error)
+	GetEmails(ctx context.Context, filter SearchEmailRequest) (EmailSearchResponse, error)
 }
 
 type EmailSearchHandler struct {
@@ -18,16 +18,14 @@ type EmailSearchHandler struct {
 func (es *EmailSearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 	log.Println("Initializing search")
 
-	var body struct {
-		Filter string `json:"filter"`
-	}
+	var body SearchEmailRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	response, err := es.Repo.GetEmails(r.Context(), body.Filter)
+	response, err := es.Repo.GetEmails(r.Context(), body)
 	if err != nil {
 		log.Printf("failed to get a response: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)

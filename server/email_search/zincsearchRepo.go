@@ -22,18 +22,24 @@ func NewZincsearchRepository() Repo {
 }
 
 // GetEmails implements Repo.
-func (z *ZincsearchRepo) GetEmails(ctx context.Context, filter string) (EmailSearchResponse, error) {
+func (z *ZincsearchRepo) GetEmails(ctx context.Context, filter SearchEmailRequest) (EmailSearchResponse, error) {
 	requestBody := SearchDocumentsBody{
 		SearchType: "matchphrase",
 		Query: SearchDocumentsQuery{
-			Term:  filter,
-			Field: "content",
+			Term:  filter.Term,
+			Field: filter.Field,
 		},
 		From:       0,
-		MaxResults: 200,
+		MaxResults: filter.MaxResults,
 		Highlight: Highlight{
 			PreTags:  []string{"<strong>"},
-			PostTags: []string{"<strong>"},
+			PostTags: []string{"</strong>"},
+			Fields: map[string]interface{}{
+				filter.Field: map[string]interface{}{
+					"pre_tags":  []string{},
+					"post_tags": []string{},
+				},
+			},
 		},
 	}
 
@@ -97,7 +103,7 @@ func convertToEmails(response EmailSearchResult) []Email {
 			Subject:   hit.Source.Subject,
 			Content:   hit.Source.Content,
 			Date:      hit.Source.Date,
-			Highlight: hit.Highlight.Content,
+			Highlight: hit.Highlight,
 		}
 		emails = append(emails, email)
 	}

@@ -12,7 +12,7 @@ import (
 // https://blog.stackademic.com/profiling-go-applications-in-the-right-way-with-examples-e784526e9481
 
 func CpuProfiling() {
-	f, err := os.Create("../profs/cpu.prof")
+	f, err := os.Create("./profs/cpu.prof")
 	if err != nil {
 		log.Fatal("could not create CPU profile: ", err)
 	}
@@ -24,7 +24,7 @@ func CpuProfiling() {
 }
 
 func MemoryProfiling() {
-	f, err := os.Create("../profs/mem.prof")
+	f, err := os.Create("./profs/mem.prof")
 	if err != nil {
 		log.Fatal("could not create memory profile: ", err)
 	}

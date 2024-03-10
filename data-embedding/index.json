@@ -45,10 +45,10 @@
                 "highlightable": true
             },
             "date": {
-                "type": "text",
+                "type": "date",
                 "index": true,
                 "store": false,
-                "sortable": false,
+                "sortable": true,
                 "aggregatable": false,
                 "highlightable": true
             },
@@ -56,7 +56,7 @@
                 "type": "text",
                 "index": true,
                 "store": false,
-                "sortable": false,
+                "sortable": true,
                 "aggregatable": false,
                 "highlightable": true
             },
@@ -80,7 +80,7 @@
                 "type": "text",
                 "index": true,
                 "store": false,
-                "sortable": false,
+                "sortable": true,
                 "aggregatable": false,
                 "highlightable": true
             },

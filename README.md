@@ -117,7 +117,7 @@ Now just open a web browser at `http://localhost:5173/` and use the app.
 ## Project next steps 
 
 - [ ] Search how to improve data-embedding to not use all the computer CPU, because if the computer has low spects it probably will crash.
-- [ ] Add more filter options to the search emails request.
+- [x] Add additional options to the search emails request.
 - [ ] Add to web project at least one new feature.
 - [ ] Add tests to server project.
 - [ ]  ~~Add tests to web project.~~

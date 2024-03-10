@@ -21,6 +21,7 @@ const (
 	indexName           = "emails"
 	dataToIndexRootPath = "./maildir/"
 	zincsearchBaseUrl   = "http://localhost:4080/api"
+	dateFormatLayout    = "Mon, 2 Jan 2006 15:04:05 -0700 (MST)"
 )
 
 func main() {
@@ -92,13 +93,18 @@ func processFile(path string) (utils.EmailData, error) {
 	if err != nil {
 		return utils.EmailData{}, err
 	}
+
+	date, err := time.Parse(dateFormatLayout, mime.GetHeader("Date"))
+	if err != nil {
+		return utils.EmailData{}, err
+	}
 	return utils.EmailData{
 		From:            mime.GetHeader("From"),
 		To:              mime.GetHeader("To"),
 		Subject:         mime.GetHeader("Subject"),
 		Content:         mime.Text,
 		MessageID:       mime.GetHeader("Message-ID"),
-		Date:            mime.GetHeader("Date"),
+		Date:            date.Format(time.RFC3339),
 		ContentType:     mime.GetHeader("Content-Type"),
 		MimeVersion:     mime.GetHeader("Mime-Version"),
 		ContentEncoding: mime.GetHeader("Content-Transfer-Encoding"),

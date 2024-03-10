@@ -93,7 +93,7 @@ as the ones set in `config/credentials.go`
 #### Search emails request:
 
 ```bash
-    curl -X POST http://localhost:3001/emailSearch -H "Content-Type: application/json" --data '{"filter": "manipulated"}'
+    curl -X POST http://localhost:3001/emailSearch -H "Content-Type: application/json" --data '{"term": "manipulated", "max_results": 10, "field": "content"}'
 ```
 **Result:**
 

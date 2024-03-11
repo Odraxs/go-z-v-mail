@@ -18,8 +18,7 @@ interface RequestBody {
   max_results: number
 }
 
-// Change to get It from .env file
-const searchEmailsEndpoint = 'http://localhost:3001/emailSearch'
+const searchEmailsEndpoint = import.meta.env.VITE_SERVER_URL + '/emailSearch'
 
 async function searchEmails({ term, field, sort, order, maxResults }: FormData) {
   const requestBody: RequestBody = {

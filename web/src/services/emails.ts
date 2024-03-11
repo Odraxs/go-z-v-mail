@@ -26,7 +26,7 @@ async function searchEmails({ term, field, sort, order, maxResults }: FormData) 
     term,
     field,
     max_results: Number(maxResults),
-    sort_fields: processSortField(sort, order)
+    sort_fields: processSortField({ sort, order })
   }
 
   console.log(requestBody)
@@ -52,10 +52,9 @@ async function searchEmails({ term, field, sort, order, maxResults }: FormData) 
       console.error(error)
       throw error
     })
-  //return emailSearchResponse.emails
 }
 
-function processSortField(sort: string | undefined, order: string | undefined) {
+function processSortField({ sort, order }: { sort?: string; order?: string }) {
   if (sort === undefined) {
     return []
   }

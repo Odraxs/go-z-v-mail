@@ -42,6 +42,11 @@ const table = useVueTable({
   getSortedRowModel: getSortedRowModel(),
   enableRowSelection: true,
   enableMultiRowSelection: false,
+  initialState: {
+    pagination: {
+      pageSize: 15
+    }
+  },
   onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
   state: {
     get sorting() {

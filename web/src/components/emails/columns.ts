@@ -1,8 +1,6 @@
 import type { Email } from '@/types'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { ArrowUpDown } from '@/components/ui/icons'
 import { h } from 'vue'
-import { Button } from '../ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import globalState from '@/helpers/globalState'
 
@@ -35,7 +33,7 @@ export const columns: ColumnDef<Email>[] = [
     cell: ({ row }) => {
       const from: string = row.getValue('from')
 
-      return h('div', { class: 'text-left font-medium' }, from)
+      return h('div', { class: 'line-clamp-1 text-left font-medium' }, from)
     }
   },
   {
@@ -44,25 +42,16 @@ export const columns: ColumnDef<Email>[] = [
     cell: ({ row }) => {
       const to: string = row.getValue('to')
 
-      return h('p', { class: 'line-clamp-1 text-left font-medium' }, to)
+      return h('p', { class: 'line-clamp-1 text-left font-medium max-w-36' }, to)
     }
   },
   {
     accessorKey: 'date',
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: 'ghost',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-        },
-        () => ['Date', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-      )
-    },
+    header: () => h('div', { class: 'text-left' }, 'Date'),
     cell: ({ row }) => {
       const date: string = row.getValue('date')
 
-      return h('div', { class: 'text-left font-medium' }, date)
+      return h('div', { class: 'text-left font-medium' }, new Date(date).toDateString())
     }
   }
 ]

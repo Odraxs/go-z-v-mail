@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import globalState from '@/helpers/globalState'
-import type { Email } from '@/types'
+import type { FormattedEmail } from '@/types'
 import { computed } from 'vue'
 import { InboxArrowDown, InboxStack } from '@/components/ui/icons'
 
-const email = computed<Email | null>(() => globalState.getEmailInfo())
+const email = computed<FormattedEmail | null>(() => globalState.getEmailInfo())
 </script>
 
 <template>
-  <div class="flex flex-col justify-center items-start md:mx-6">
+  <div v-if="email !== null" class="flex flex-col justify-center items-start md:mx-6">
     <h2 class="text-2xl md:text-3xl font-semibold mb-10 md:mb-[3.2rem]">Email Details</h2>
     <section
-      v-if="email !== null"
-      class="dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 md:p-12 h-96 w-full max-h-96 md:h-full md:max-h-[40rem] overflow-y-auto"
+      class="dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 md:p-12 h-96 w-full max-h-96 md:min-h-[40rem] overflow-y-auto"
     >
       <p
         class="bg-blue-100 text-blue-800 text-md font-medium inline-flex items-center px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-blue-400 mb-2"

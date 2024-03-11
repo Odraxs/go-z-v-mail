@@ -29,6 +29,7 @@ func (z *ZincsearchRepo) GetEmails(ctx context.Context, filter SearchEmailReques
 			Term:  filter.Term,
 			Field: filter.Field,
 		},
+		SortFields: filter.SortFields,
 		From:       0,
 		MaxResults: filter.MaxResults,
 		Highlight: Highlight{

@@ -1,0 +1,22 @@
+{
+    "contacts": [
+        {
+            "id": "1",
+            "contact": "github",
+            "link": "https://github.com/Odraxs",
+            "icon": "https://www.vectorlogo.zone/logos/github/github-tile.svg"
+        },
+        {
+            "id": "2",
+            "contact": "discord",
+            "link": "https://discordapp.com/users/923362226604216390",
+            "icon": "https://www.svgrepo.com/show/353655/discord-icon.svg"
+        },
+        {
+            "id": "3",
+            "contact": "linkedin",
+            "link": "https://www.linkedin.com/in/david-roldan-marin",
+            "icon": "https://upload.wikimedia.org/wikipedia/commons/8/81/LinkedIn_icon.svg"
+        }
+    ]
+}

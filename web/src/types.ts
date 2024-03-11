@@ -24,4 +24,4 @@ interface HighlightContent {
   to?: string[]
 }
 
-export type { EmailSearchResponse, Email, HighlightContent, FormattedEmail, RequestBody }
+export type { EmailSearchResponse, Email, HighlightContent, FormattedEmail }

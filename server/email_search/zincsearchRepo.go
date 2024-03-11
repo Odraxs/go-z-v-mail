@@ -11,7 +11,7 @@ import (
 	"github.com/Odraxs/go-z-v-mail/server/config"
 )
 
-const zincsearchEndpoint = "http://localhost:4080/api/emails/_search"
+const zincsearchEndpoint = "http://zincsearch:4080/api/emails/_search"
 
 var httpClient = &http.Client{}
 

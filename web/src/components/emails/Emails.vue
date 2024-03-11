@@ -25,6 +25,7 @@ import {
   SelectGroup,
   SelectItem
 } from '@/components/ui/select'
+import TableSkeleton from './TableSkeleton.vue'
 import globalState from '@/helpers/globalState'
 
 const requestState = ref({
@@ -208,8 +209,8 @@ async function handleSubmit(values: any) {
       </Button>
     </Form>
 
-    <div v-if="requestState.isLoading && requestState.error === null">
-      <strong class="text-md font-bold">Loading...</strong>
+    <div v-if="requestState.isLoading && requestState.error === null" class="px-3 py-6">
+      <TableSkeleton />
     </div>
     <div v-if="!requestState.isLoading && requestState.error !== null">
       <strong class="text-lg font-bold">{{ requestState.error }}</strong>

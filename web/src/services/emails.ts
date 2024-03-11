@@ -18,15 +18,14 @@ interface RequestBody {
   max_results: number
 }
 
-// Change to get It from .env file
-const searchEmailsEndpoint = 'http://localhost:3001/emailSearch'
+const searchEmailsEndpoint = import.meta.env.VITE_SERVER_URL + '/emailSearch'
 
 async function searchEmails({ term, field, sort, order, maxResults }: FormData) {
   const requestBody: RequestBody = {
     term,
     field,
     max_results: Number(maxResults),
-    sort_fields: processSortField(sort, order)
+    sort_fields: processSortField({ sort, order })
   }
 
   console.log(requestBody)
@@ -52,10 +51,9 @@ async function searchEmails({ term, field, sort, order, maxResults }: FormData) 
       console.error(error)
       throw error
     })
-  //return emailSearchResponse.emails
 }
 
-function processSortField(sort: string | undefined, order: string | undefined) {
+function processSortField({ sort, order }: { sort?: string; order?: string }) {
   if (sort === undefined) {
     return []
   }

@@ -1,8 +1,8 @@
-import type { Email } from '@/types'
+import type { Email, FormattedEmail, HighlightContent } from '@/types'
 import { ref } from 'vue'
 
 interface GlobalState {
-  emailInfo: Email | null
+  emailInfo: FormattedEmail | null
 }
 
 const globalState = {
@@ -29,11 +29,20 @@ function formatEmailInfo(emailInfo: Email) {
     .replace(/(&nbsp;)+/g, '&nbsp;')
     .replace(/(&#x0D;<br>)+/g, '<br>')
 
-  const formattedHighlights = emailInfo.highlight.map((highlight) =>
+  const [key] = Object.keys(emailInfo.highlight) as (keyof HighlightContent)[]
+
+  const formattedHighlights = emailInfo.highlight[key]!.map((highlight) =>
     highlight.replace(/\n/g, '<br>').replace(/\r/g, '&#x0D;')
   )
 
-  return { ...emailInfo, content: formattedContent, highlight: formattedHighlights }
+  const formattedDate = new Date(emailInfo.date).toUTCString()
+
+  return {
+    ...emailInfo,
+    content: formattedContent,
+    highlight: formattedHighlights,
+    date: formattedDate
+  }
 }
 
 export default globalState

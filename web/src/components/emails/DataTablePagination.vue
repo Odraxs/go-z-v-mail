@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { ref } from 'vue'
 
-const pageSizes = ref([10, 20, 30])
+const pageSizes = ref([15, 25, 35])
 
 interface DataTablePaginationProps {
   table: Table<TData>

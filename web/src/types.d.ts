@@ -10,7 +10,18 @@ interface Email {
   content: string
   subject: string
   date: string
+  highlight: HighlightContent
+}
+
+interface FormattedEmail extends Omit<Email, 'highlight'> {
   highlight: string[]
 }
 
-export type { EmailSearchResponse, Email }
+interface HighlightContent {
+  content?: string[]
+  subject?: string[]
+  from?: string[]
+  to?: string[]
+}
+
+export type { EmailSearchResponse, Email, HighlightContent, FormattedEmail, RequestBody }

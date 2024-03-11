@@ -53,7 +53,7 @@
                 "highlightable": true
             },
             "from": {
-                "type": "text",
+                "type": "keyword",
                 "index": true,
                 "store": false,
                 "sortable": true,
@@ -77,7 +77,7 @@
                 "highlightable": true
             },
             "subject": {
-                "type": "text",
+                "type": "keyword",
                 "index": true,
                 "store": false,
                 "sortable": true,

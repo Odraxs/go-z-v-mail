@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -98,10 +99,14 @@ func processFile(path string) (utils.EmailData, error) {
 	if err != nil {
 		return utils.EmailData{}, err
 	}
+
+	// Format the subject because many of them have string escapes that affect the `subject` sorting.
+	subject := strings.ReplaceAll(mime.GetHeader("Subject"), "\"", "")
+
 	return utils.EmailData{
 		From:            mime.GetHeader("From"),
 		To:              mime.GetHeader("To"),
-		Subject:         mime.GetHeader("Subject"),
+		Subject:         subject,
 		Content:         mime.Text,
 		MessageID:       mime.GetHeader("Message-ID"),
 		Date:            date.Format(time.RFC3339),

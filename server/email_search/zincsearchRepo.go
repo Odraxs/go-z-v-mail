@@ -11,7 +11,10 @@ import (
 	"github.com/Odraxs/go-z-v-mail/server/config"
 )
 
-const zincsearchEndpoint = "http://zincsearch:4080/api/emails/_search"
+const (
+	zincsearchEndpoint = "http://zincsearch:4080/api/emails/_search"
+	defaultSearchType  = "matchphrase"
+)
 
 var httpClient = &http.Client{}
 
@@ -23,8 +26,16 @@ func NewZincsearchRepository() Repo {
 
 // GetEmails implements Repo.
 func (z *ZincsearchRepo) GetEmails(ctx context.Context, filter SearchEmailRequest) (EmailSearchResponse, error) {
+	var searchType string
+
+	if filter.Field == "from" {
+		searchType = "prefix"
+	} else {
+		searchType = defaultSearchType
+	}
+
 	requestBody := SearchDocumentsBody{
-		SearchType: "matchphrase",
+		SearchType: searchType,
 		Query: SearchDocumentsQuery{
 			Term:  filter.Term,
 			Field: filter.Field,

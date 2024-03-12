@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  zincsearch:
+    image: public.ecr.aws/zinclabs/zincsearch:latest
+    volumes:
+      - ./data-embedding:/data:Z
+    environment:
+      - ZINC_DATA_PATH=/data
+      - ZINC_FIRST_ADMIN_USER=admin
+      - ZINC_FIRST_ADMIN_PASSWORD=password
+    ports:
+      - '4080:4080'
+
+  server:
+    build: ./server
+    depends_on: 
+      - zincsearch
+    ports:
+      - '3001:3001'
+
+  web:
+    build: ./web
+    depends_on: 
+      - server
+    ports:
+      - '5173:5173'

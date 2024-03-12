@@ -45,18 +45,18 @@
                 "highlightable": true
             },
             "date": {
-                "type": "text",
+                "type": "date",
                 "index": true,
                 "store": false,
-                "sortable": false,
+                "sortable": true,
                 "aggregatable": false,
                 "highlightable": true
             },
             "from": {
-                "type": "text",
+                "type": "keyword",
                 "index": true,
                 "store": false,
-                "sortable": false,
+                "sortable": true,
                 "aggregatable": false,
                 "highlightable": true
             },
@@ -77,10 +77,10 @@
                 "highlightable": true
             },
             "subject": {
-                "type": "text",
+                "type": "keyword",
                 "index": true,
                 "store": false,
-                "sortable": false,
+                "sortable": true,
                 "aggregatable": false,
                 "highlightable": true
             },

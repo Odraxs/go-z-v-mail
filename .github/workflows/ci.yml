@@ -71,6 +71,7 @@ jobs:
         run: go vet ./...
         working-directory: ${{ matrix.dir }}
 
+      # This action doesn't work with go-version > 1.19 😟
       # - uses: dominikh/staticcheck-action@v1.3.0
       #   with:
       #     version: "2022.1.3"

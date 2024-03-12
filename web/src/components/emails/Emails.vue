@@ -102,7 +102,7 @@ async function handleSubmit(values: any) {
         </FormField>
         <FormField v-slot="{ componentField }" name="maxResults">
           <FormItem class="my-3">
-            <FormLabel class="text-base ml-3">Max amount of result</FormLabel>
+            <FormLabel class="text-base ml-3">Max amount of results</FormLabel>
 
             <Select v-bind="componentField">
               <FormControl>
@@ -130,7 +130,7 @@ async function handleSubmit(values: any) {
       <div class="flex flex-row gap-2 lg:gap-6">
         <FormField v-slot="{ componentField }" name="sort" v-model="needsOrder">
           <FormItem class="w-full my-3">
-            <FormLabel class="text-base ml-3">Filed to order</FormLabel>
+            <FormLabel class="text-base ml-3">Field to order <strong>(Optional)</strong></FormLabel>
 
             <Select v-bind="componentField">
               <FormControl>

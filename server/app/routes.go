@@ -9,6 +9,8 @@ import (
 	"github.com/go-chi/cors"
 )
 
+var httpClient = &http.Client{}
+
 func (app *App) loadRoutes() {
 	router := chi.NewRouter()
 
@@ -32,7 +34,7 @@ func (app *App) loadRoutes() {
 
 func (app *App) loadEmailSearchRoutes(router chi.Router) {
 	emailSearchHandler := &email_search.EmailSearchHandler{
-		Repo: email_search.NewZincsearchRepository(),
+		Repo: email_search.NewZincsearchRepository(httpClient),
 	}
 
 	router.Post("/", emailSearchHandler.Search)

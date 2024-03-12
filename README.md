@@ -1,6 +1,6 @@
 ## GO Z V MAIL
 
-This project will consist in 4 folders:
+This project consist in 4 folders:
 
 - `data-embedding`: the folder that automated the process to create and embed the index `emails` to the zincsearch database.
 - `web`: the folder that contains the web application.
@@ -87,7 +87,7 @@ Right now the server doesn't need any external configuration, just make sure tha
 zincsearch server is running in `localhost:4080` and that the user credentials are the same
 as the ones set in `config/credentials.go`
 
-- Change `zincsearchEndpoint` to `http://localhost:4080/api/emails/_search` in the `zincsearchRepo.go` file.
+- Change `zincsearchEndpoint` to `http://localhost:4080/api` in the `zincsearchRepo.go` file.
 
 - Start server
     ```bash
@@ -114,7 +114,7 @@ as the ones set in `config/credentials.go`
 #### Search emails request:
 
 ```bash
-    curl -X POST http://localhost:3001/emailSearch -H "Content-Type: application/json" --data '{"term": "manipulated", "max_results": 10, "field": "content"}'
+    curl -X POST http://localhost:3001/emailSearch -H "Content-Type: application/json" --data '{"term": "manipulated", "max_results": 10, "field": "content", "sort_fields": []}'
 ```
 **Result:**
 
@@ -140,6 +140,6 @@ Now just open a web browser at `http://localhost:5173/` and use the app.
 - [x] Add additional options to the search emails request.
 - [x] Add to web project at least one new feature.
 - [x] Dockerize sever and web projects.
-- [ ] Add tests to server project.
+- [x] Add tests to server project.
 - [ ] Search how to improve data-embedding to not use all the computer CPU, because if the computer has low spects it probably will crash.
 - [ ]  ~~Add tests to web project.~~

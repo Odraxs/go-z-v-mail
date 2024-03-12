@@ -87,7 +87,7 @@ Right now the server doesn't need any external configuration, just make sure tha
 zincsearch server is running in `localhost:4080` and that the user credentials are the same
 as the ones set in `config/credentials.go`
 
-- Change `zincsearchEndpoint` to `http://localhost:4080/api` in the `zincsearchRepo.go` file.
+- Change `zincsearchEndpoint` to `http://localhost:4080/api` in the `zincsearch_repo.go` file.
 
 - Start server
     ```bash

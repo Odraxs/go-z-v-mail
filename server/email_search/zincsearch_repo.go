@@ -12,16 +12,22 @@ import (
 )
 
 const (
-	zincsearchEndpoint = "http://zincsearch:4080/api/emails/_search"
+	zincsearchEndpoint = "http://zincsearch:4080/api"
 	defaultSearchType  = "matchphrase"
 )
 
 var httpClient = &http.Client{}
 
-type ZincsearchRepo struct{}
+type ZincsearchRepo struct {
+	HttpClient         *http.Client
+	ZincsearchEndpoint string
+}
 
 func NewZincsearchRepository() Repo {
-	return &ZincsearchRepo{}
+	return &ZincsearchRepo{
+		HttpClient:         httpClient,
+		ZincsearchEndpoint: zincsearchEndpoint,
+	}
 }
 
 // GetEmails implements Repo.
@@ -62,14 +68,14 @@ func (z *ZincsearchRepo) GetEmails(ctx context.Context, filter SearchEmailReques
 		return response, fmt.Errorf("failed to encode zincsearch request body: %w", err)
 	}
 
-	zRequest, err := http.NewRequest("POST", zincsearchEndpoint, bytes.NewBuffer(jsonBody))
+	zRequest, err := http.NewRequest(http.MethodPost, z.ZincsearchEndpoint+"/emails/_search", bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return response, fmt.Errorf("failed to create zincsearch request: %w", err)
 	}
 
 	zRequest = prepareRequest(zRequest)
 
-	zResponse, err := httpClient.Do(zRequest)
+	zResponse, err := z.HttpClient.Do(zRequest)
 	if err != nil || zResponse.StatusCode != http.StatusOK {
 		return response, fmt.Errorf("request to zincsearch failed: %w", err)
 	}

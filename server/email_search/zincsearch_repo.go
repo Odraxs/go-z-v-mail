@@ -16,14 +16,12 @@ const (
 	defaultSearchType  = "matchphrase"
 )
 
-var httpClient = &http.Client{}
-
 type ZincsearchRepo struct {
 	HttpClient         *http.Client
 	ZincsearchEndpoint string
 }
 
-func NewZincsearchRepository() Repo {
+func NewZincsearchRepository(httpClient *http.Client) Repo {
 	return &ZincsearchRepo{
 		HttpClient:         httpClient,
 		ZincsearchEndpoint: zincsearchEndpoint,

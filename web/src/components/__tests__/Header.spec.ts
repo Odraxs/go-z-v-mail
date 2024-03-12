@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 
 import { mount } from '@vue/test-utils'
-import EmailsVisualizer from '../EmailsVisualizer.vue'
+import Header from '../Header.vue'
 
-describe('EmailsVisualizer', () => {
+describe('Header', () => {
   it('renders properly', () => {
-    const wrapper = mount(EmailsVisualizer, { props: { msg: 'Hello Vitest' } })
+    const wrapper = mount(Header, { props: { msg: 'Hello Vitest' } })
     expect(wrapper.text()).toContain('Hello Vitest')
   })
 })

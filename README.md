@@ -9,7 +9,7 @@ This project consist in 4 folders:
 
 ## Requirements:
 
-- Go >= 1.22(recommended)
+- Go == 1.22
 - Docker
 - Docker-compose
 - Node >= 20.10.0(recommended)
@@ -17,13 +17,15 @@ This project consist in 4 folders:
 
 ## I just want to see the project running!
 
-- Give write permission:
+- Give permissions:
     ```bash
-    |   chmod a+rwx ./data-embedding
+       chmod +x envs.sh
+       chmod a+rwx ./data-embedding
     ```
 - Only follow the instructions of [data-embedding](#data-embedding)
 - Then run the following commands:
     ```bash
+        . envs.sh
         cd docker
         docker-compose up
     ```
@@ -33,6 +35,12 @@ This project consist in 4 folders:
 ## Development Instructions:
 
 To setup the project first run the following commands:
+
+- Set up env variables(you can modify the file to set the values you want)
+```bash
+    chmod +x envs.sh
+    . envs.sh
+```
 
 - Give write permission 
 ```bash
@@ -129,7 +137,7 @@ To start the web server run:
 ```bash
     cd ../web
     npm i
-    npm run lin
+    npm run lint
     npm run dev
 ```
 

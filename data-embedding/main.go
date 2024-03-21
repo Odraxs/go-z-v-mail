@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"strings"
 	"sync"
 	"time"
@@ -32,7 +33,18 @@ var (
 
 func main() {
 	log.Println("Starting indexer!")
-	utils.CpuProfiling()
+
+	//For some reason utils.CpuProfiling() doesn't generates a proper cpu profiling
+	f, err := os.Create("./profs/cpu.prof")
+	if err != nil {
+		log.Fatal("could not create CPU profile: ", err)
+	}
+	defer f.Close()
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal("could not start CPU profile: ", err)
+	}
+	defer pprof.StopCPUProfile()
+
 	indexerData, err := createIndexerFromJsonFile(jsonIndexerPath)
 	if err != nil {
 		log.Fatal(err)

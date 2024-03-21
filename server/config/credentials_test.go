@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Odraxs/go-z-v-mail/server/config"
+	"github.com/Odraxs/go-z-v-mail/server/test/fixtures"
 )
 
 func TestGetZincsearchCredentials(t *testing.T) {
@@ -26,6 +27,7 @@ func TestGetZincsearchCredentials(t *testing.T) {
 		},
 	}
 
+	fixtures.CreateEnvs()
 	for _, test := range test {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
@@ -40,6 +42,7 @@ func TestGetZincsearchCredentials(t *testing.T) {
 			}
 		})
 	}
+	fixtures.RemoveEnvs()
 }
 
 func TestLoadZincsearchCredentials(t *testing.T) {
@@ -61,6 +64,7 @@ func TestLoadZincsearchCredentials(t *testing.T) {
 			},
 		}}
 
+	fixtures.CreateEnvs()
 	for _, test := range test {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
@@ -70,4 +74,5 @@ func TestLoadZincsearchCredentials(t *testing.T) {
 			}
 		})
 	}
+	fixtures.RemoveEnvs()
 }

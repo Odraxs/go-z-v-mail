@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -35,7 +34,7 @@ func TestGetZincsearchCredentials(t *testing.T) {
 			}
 
 			credentials := config.GetZincsearchCredentials()
-			fmt.Printf("-------- %+v", credentials)
+
 			if !reflect.DeepEqual(credentials, tt.expected) {
 				t.Fatalf("Expected %v but got %v", tt.expected, credentials)
 			}

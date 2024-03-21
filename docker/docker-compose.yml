@@ -13,7 +13,7 @@ services:
       - '4080:4080'
 
   server:
-    build: ../server
+    image: odraxs/go-z-v-mail-server:latest
     depends_on: 
       - zincsearch
     environment:
@@ -23,7 +23,7 @@ services:
       - '3001:3001'
 
   web:
-    build: ../web
+    image: odraxs/go-z-v-mail-web:latest
     depends_on: 
       - server
     ports:

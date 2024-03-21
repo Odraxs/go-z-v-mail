@@ -25,6 +25,11 @@ const (
 	dateFormatLayout    = "Mon, 2 Jan 2006 15:04:05 -0700 (MST)"
 )
 
+var (
+	zincUser     = os.Getenv("ZINC_USER")
+	zincPassword = os.Getenv("ZINC_PASSWORD")
+)
+
 func main() {
 	log.Println("Starting indexer!")
 	utils.CpuProfiling()
@@ -140,8 +145,8 @@ func sendBulkToZincSearch(records []utils.EmailData) {
 		log.Println(err)
 		return
 	}
-	//TODO: change to .evn latter
-	req.SetBasicAuth("admin", "password")
+
+	req.SetBasicAuth(zincUser, zincPassword)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36")
 
@@ -211,8 +216,7 @@ func deleteIndexOnZincSearch(indexName string) error {
 		return err
 	}
 
-	//TODO: Change to .env file latter
-	req.SetBasicAuth("admin", "password")
+	req.SetBasicAuth(zincUser, zincPassword)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

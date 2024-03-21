@@ -28,8 +28,6 @@ async function searchEmails({ term, field, sort, order, maxResults }: FormData) 
     sort_fields: processSortField({ sort, order })
   }
 
-  console.log(requestBody)
-
   return fetch(searchEmailsEndpoint, {
     method: 'POST',
     headers: {

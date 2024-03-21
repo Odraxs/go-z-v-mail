@@ -1,12 +1,12 @@
 package config_test
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/Odraxs/go-z-v-mail/server/config"
+	"github.com/Odraxs/go-z-v-mail/server/test/fixtures"
 )
 
 func TestGetZincsearchCredentials(t *testing.T) {
@@ -27,6 +27,7 @@ func TestGetZincsearchCredentials(t *testing.T) {
 		},
 	}
 
+	fixtures.CreateEnvs()
 	for _, test := range test {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
@@ -35,12 +36,13 @@ func TestGetZincsearchCredentials(t *testing.T) {
 			}
 
 			credentials := config.GetZincsearchCredentials()
-			fmt.Printf("-------- %+v", credentials)
+
 			if !reflect.DeepEqual(credentials, tt.expected) {
 				t.Fatalf("Expected %v but got %v", tt.expected, credentials)
 			}
 		})
 	}
+	fixtures.RemoveEnvs()
 }
 
 func TestLoadZincsearchCredentials(t *testing.T) {
@@ -62,6 +64,7 @@ func TestLoadZincsearchCredentials(t *testing.T) {
 			},
 		}}
 
+	fixtures.CreateEnvs()
 	for _, test := range test {
 		tt := test
 		t.Run(tt.name, func(t *testing.T) {
@@ -71,4 +74,5 @@ func TestLoadZincsearchCredentials(t *testing.T) {
 			}
 		})
 	}
+	fixtures.RemoveEnvs()
 }

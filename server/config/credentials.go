@@ -1,6 +1,9 @@
 package config
 
-import "log"
+import (
+	"log"
+	"os"
+)
 
 type ZincsearchCredentials struct {
 	User     string
@@ -17,10 +20,11 @@ func LoadZincsearchCredentials() ZincsearchCredentials {
 
 	log.Println("Loading zincsearch credentials...")
 	credentials := &ZincsearchCredentials{}
-	// Emulation of config loading since the doc requested to no use any other external library
+
+	// Configure the env vars in the shell, since the doc requested to not use any other external library
 	// so I can't use something like `godotenv` to get the user credentials for a .env file
-	credentials.User = "admin"
-	credentials.Password = "password"
+	credentials.User = os.Getenv("ZINC_USER")
+	credentials.Password = os.Getenv("ZINC_PASSWORD")
 
 	zincsearchCredentials = credentials
 

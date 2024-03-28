@@ -34,7 +34,7 @@ var (
 func main() {
 	log.Println("Starting indexer!")
 
-	//For some reason utils.CpuProfiling() doesn't generates a proper cpu profiling
+	//utils.CpuProfiling() doesn't generates a proper cpu profiling
 	f, err := os.Create("./profs/cpu.prof")
 	if err != nil {
 		log.Fatal("could not create CPU profile: ", err)
@@ -142,7 +142,7 @@ func processFile(path string) (utils.EmailData, error) {
 
 func sendBulkToZincSearch(records []utils.EmailData) {
 	bulkData := utils.BulkData{
-		Index:   "emails",
+		Index:   indexName,
 		Records: records,
 	}
 
@@ -152,7 +152,7 @@ func sendBulkToZincSearch(records []utils.EmailData) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", zincsearchBaseUrl+"/_bulkv2", bytes.NewReader(jsonData))
+	req, err := http.NewRequest(http.MethodPost, zincsearchBaseUrl+"/_bulkv2", bytes.NewReader(jsonData))
 	if err != nil {
 		log.Println(err)
 		return
@@ -197,33 +197,33 @@ func createIndexerFromJsonFile(filepath string) (utils.IndexerData, error) {
 func createIndexOnZincSearch(indexerData utils.IndexerData) error {
 	jsonData, err := json.Marshal(indexerData)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to encode the index data: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", zincsearchBaseUrl+"/index", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, zincsearchBaseUrl+"/index", bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to create the index request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth("admin", "password")
+	req.SetBasicAuth(zincUser, zincPassword)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("zincsearch request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("failed to create indexer, status code: %d", resp.StatusCode)
+		return fmt.Errorf("failed to create indexer, status code: %d", resp.StatusCode)
 	}
 
 	return nil
 }
 
 func deleteIndexOnZincSearch(indexName string) error {
-	req, err := http.NewRequest("DELETE", zincsearchBaseUrl+"/index/"+indexName, nil)
+	req, err := http.NewRequest(http.MethodDelete, zincsearchBaseUrl+"/index/"+indexName, nil)
 	if err != nil {
 		return err
 	}

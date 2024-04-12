@@ -68,6 +68,8 @@ func main() {
 	var records []utils.EmailData
 	var locker sync.Mutex
 	var wg sync.WaitGroup
+	routines := make(chan int, 1000)
+	jobCounter := 0
 
 	// Process all the folders contained in the path `dataToIndexRootPath` to obtain all the emails records
 	err = filepath.Walk(dataToIndexRootPath, func(path string, info os.FileInfo, err error) error {
@@ -76,27 +78,35 @@ func main() {
 		}
 		if !info.IsDir() {
 			wg.Add(1)
-			go func(p string) {
+			jobCounter++
+			go func(p string, routines <-chan int) {
 				defer wg.Done()
-				emailData, err := processFile(p)
-				if err != nil {
-					log.Println(err)
-					return
+				for range routines {
+					emailData, err := processFile(p)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+					locker.Lock()
+					records = append(records, emailData)
+					locker.Unlock()
 				}
-				locker.Lock()
-				records = append(records, emailData)
-				locker.Unlock()
-			}(path)
+			}(path, routines)
+			routines <- jobCounter
 		}
 		return nil
 	})
+	close(routines)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	wg.Wait()
 
-	sendBulkToZincSearch(records)
+	err = sendBulkToZincSearch(records)
+	if err != nil {
+		log.Println("something happened while storing the records: ", err)
+	}
 	utils.MemoryProfiling()
 	duration := time.Since(startTime)
 	log.Printf("Finished indexing. Time taken: %.2f seconds", duration.Seconds())
@@ -140,7 +150,7 @@ func processFile(path string) (utils.EmailData, error) {
 	}, nil
 }
 
-func sendBulkToZincSearch(records []utils.EmailData) {
+func sendBulkToZincSearch(records []utils.EmailData) error {
 	bulkData := utils.BulkData{
 		Index:   indexName,
 		Records: records,
@@ -148,14 +158,12 @@ func sendBulkToZincSearch(records []utils.EmailData) {
 
 	jsonData, err := json.Marshal(bulkData)
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("failed to decode data into json: %w", err)
 	}
 
 	req, err := http.NewRequest(http.MethodPost, zincsearchBaseUrl+"/_bulkv2", bytes.NewReader(jsonData))
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("failed to create the http request: %w", err)
 	}
 
 	req.SetBasicAuth(zincUser, zincPassword)
@@ -164,16 +172,21 @@ func sendBulkToZincSearch(records []utils.EmailData) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("something happened while doing the request to zincsearch:  %w", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status response: %d", resp.StatusCode)
+	}
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
-		return
+		return err
 	}
+
+	return nil
 }
 
 func createIndexerFromJsonFile(filepath string) (utils.IndexerData, error) {

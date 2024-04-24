@@ -68,6 +68,8 @@ func main() {
 	var records []utils.EmailData
 	var locker sync.Mutex
 	var wg sync.WaitGroup
+	// This channel was created with the intention to limit the cpu usage from the goroutines but after running it 
+	// it seems like it doesn't work as expected, anyways I'm gonna let it there since it could be helpful to someone trying to optimize this code. 
 	routines := make(chan int, 1000)
 	jobCounter := 0
 

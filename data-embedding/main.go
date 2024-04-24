@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"strings"
 	"sync"
 	"time"
@@ -32,7 +33,18 @@ var (
 
 func main() {
 	log.Println("Starting indexer!")
-	utils.CpuProfiling()
+
+	//utils.CpuProfiling() doesn't generates a proper cpu profiling
+	f, err := os.Create("./profs/cpu.prof")
+	if err != nil {
+		log.Fatal("could not create CPU profile: ", err)
+	}
+	defer f.Close()
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal("could not start CPU profile: ", err)
+	}
+	defer pprof.StopCPUProfile()
+
 	indexerData, err := createIndexerFromJsonFile(jsonIndexerPath)
 	if err != nil {
 		log.Fatal(err)
@@ -56,6 +68,10 @@ func main() {
 	var records []utils.EmailData
 	var locker sync.Mutex
 	var wg sync.WaitGroup
+	// This channel was created with the intention to limit the cpu usage from the goroutines but after running it 
+	// it seems like it doesn't work as expected, anyways I'm gonna let it there since it could be helpful to someone trying to optimize this code. 
+	routines := make(chan int, 1000)
+	jobCounter := 0
 
 	// Process all the folders contained in the path `dataToIndexRootPath` to obtain all the emails records
 	err = filepath.Walk(dataToIndexRootPath, func(path string, info os.FileInfo, err error) error {
@@ -64,27 +80,35 @@ func main() {
 		}
 		if !info.IsDir() {
 			wg.Add(1)
-			go func(p string) {
+			jobCounter++
+			go func(p string, routines <-chan int) {
 				defer wg.Done()
-				emailData, err := processFile(p)
-				if err != nil {
-					log.Println(err)
-					return
+				for range routines {
+					emailData, err := processFile(p)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+					locker.Lock()
+					records = append(records, emailData)
+					locker.Unlock()
 				}
-				locker.Lock()
-				records = append(records, emailData)
-				locker.Unlock()
-			}(path)
+			}(path, routines)
+			routines <- jobCounter
 		}
 		return nil
 	})
+	close(routines)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	wg.Wait()
 
-	sendBulkToZincSearch(records)
+	err = sendBulkToZincSearch(records)
+	if err != nil {
+		log.Println("something happened while storing the records: ", err)
+	}
 	utils.MemoryProfiling()
 	duration := time.Since(startTime)
 	log.Printf("Finished indexing. Time taken: %.2f seconds", duration.Seconds())
@@ -128,22 +152,20 @@ func processFile(path string) (utils.EmailData, error) {
 	}, nil
 }
 
-func sendBulkToZincSearch(records []utils.EmailData) {
+func sendBulkToZincSearch(records []utils.EmailData) error {
 	bulkData := utils.BulkData{
-		Index:   "emails",
+		Index:   indexName,
 		Records: records,
 	}
 
 	jsonData, err := json.Marshal(bulkData)
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("failed to decode data into json: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", zincsearchBaseUrl+"/_bulkv2", bytes.NewReader(jsonData))
+	req, err := http.NewRequest(http.MethodPost, zincsearchBaseUrl+"/_bulkv2", bytes.NewReader(jsonData))
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("failed to create the http request: %w", err)
 	}
 
 	req.SetBasicAuth(zincUser, zincPassword)
@@ -152,16 +174,21 @@ func sendBulkToZincSearch(records []utils.EmailData) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println(err)
-		return
+		return fmt.Errorf("something happened while doing the request to zincsearch:  %w", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status response: %d", resp.StatusCode)
+	}
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
-		return
+		return err
 	}
+
+	return nil
 }
 
 func createIndexerFromJsonFile(filepath string) (utils.IndexerData, error) {
@@ -185,33 +212,33 @@ func createIndexerFromJsonFile(filepath string) (utils.IndexerData, error) {
 func createIndexOnZincSearch(indexerData utils.IndexerData) error {
 	jsonData, err := json.Marshal(indexerData)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to encode the index data: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", zincsearchBaseUrl+"/index", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, zincsearchBaseUrl+"/index", bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to create the index request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth("admin", "password")
+	req.SetBasicAuth(zincUser, zincPassword)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("zincsearch request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("failed to create indexer, status code: %d", resp.StatusCode)
+		return fmt.Errorf("failed to create indexer, status code: %d", resp.StatusCode)
 	}
 
 	return nil
 }
 
 func deleteIndexOnZincSearch(indexName string) error {
-	req, err := http.NewRequest("DELETE", zincsearchBaseUrl+"/index/"+indexName, nil)
+	req, err := http.NewRequest(http.MethodDelete, zincsearchBaseUrl+"/index/"+indexName, nil)
 	if err != nil {
 		return err
 	}

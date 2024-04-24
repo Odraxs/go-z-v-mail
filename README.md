@@ -1,11 +1,12 @@
 ## GO Z V MAIL
 
-This project consist in 4 folders:
+This project consist in 5 folders:
 
 - `data-embedding`: the folder that automated the process to create and embed the index `emails` to the zincsearch database.
 - `web`: the folder that contains the web application.
 - `server`: the folder that contains the go server that will handle the requests to the database `zincsearch` and retrieves the results(limited to 200).
 - `docker`: the folder that contains the docker-compose file that can be used to run the entire project.
+- `terraform`: the folder that contains the terraform code that allows top deploy the project to an `aws` EC2 instance.
 
 ## Requirements:
 
@@ -14,6 +15,7 @@ This project consist in 4 folders:
 - Docker-compose
 - Node >= 20.10.0(recommended)
 - Graphviz(if you want to generate the profiling graphs)
+- terraform(Optional, more info [here](/terraform/README.md))
 
 ## I just want to see the project running!
 
